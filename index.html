@@ -188,15 +188,16 @@ Fig. 2 - The star of a vertex in a Delaunay tessellation
 <p>with the Kronecker delta <span class="math inline">\(\delta_{ij}\)</span> and the Levi-Civita symbol <span class="math inline">\(\epsilon^{ijk}\)</span>.</p>
 <p>For a point <span class="math inline">\(\boldsymbol{x} \in \mathbb{R}^d\)</span>, the reconstruction amounts to looking up the corresponding simplex and velocity deformation modes.</p>
 <h2 id="implementation">Implementation</h2>
-<p>For simplicity, we will here only discuss the two-dimensional case. The concepts and code generalize straightforwardly to higher dimensions.</p>
+<p>For simplicity, we will here only discuss the two-dimensional case. The code generalizes straightforwardly to higher dimensions.</p>
 <ol type="1">
 <li>Given the set <span class="math inline">\(\mathcal{P}\)</span>, evaluate the Delaunay tesselation <span class="math inline">\(\mathcal{D}\)</span> consisting of <span class="math inline">\(N_T\)</span> triangles:</li>
 </ol>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python numberLines"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="im">from</span> scipy.spatial <span class="im">import</span> Delaunay</span>
-<span id="cb1-3"><a href="#cb1-3"></a></span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="co">#The Delaunay tesselation</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a>delaunay <span class="op">=</span> Delaunay(points)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python numberLines"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="co">#Load the numpy and scipy libraries</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="im">from</span> scipy.spatial <span class="im">import</span> Delaunay</span>
+<span id="cb1-4"><a href="#cb1-4"></a></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="co">#The Delaunay tesselation</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a>delaunay <span class="op">=</span> Delaunay(points)</span></code></pre></div>
 <ol start="2" type="1">
 <li>For every simplex in the tesselation, evaluate the gradient of the density field <span class="math inline">\(\nabla \rho\)</span> and the gradient of the velocity field <span class="math inline">\(\nabla \boldsymbol{v}\)</span>:</li>
 </ol>
@@ -219,41 +220,36 @@ Fig. 2 - The star of a vertex in a Delaunay tessellation
 <span id="cb2-17"><a href="#cb2-17"></a><span class="co">#The gradients</span></span>
 <span id="cb2-18"><a href="#cb2-18"></a>Drho <span class="op">=</span> []</span>
 <span id="cb2-19"><a href="#cb2-19"></a>Dv  <span class="op">=</span> []</span>
-<span id="cb2-20"><a href="#cb2-20"></a></span>
-<span id="cb2-21"><a href="#cb2-21"></a><span class="cf">for</span> sim <span class="kw">in</span> sims:</span>
-<span id="cb2-22"><a href="#cb2-22"></a>    [p0, p1, p2] <span class="op">=</span> points[sim] </span>
-<span id="cb2-23"><a href="#cb2-23"></a>    [r0, r1, r2] <span class="op">=</span> rho[sim]</span>
-<span id="cb2-24"><a href="#cb2-24"></a>    [v0, v1, v2] <span class="op">=</span> velocities[sim]</span>
-<span id="cb2-25"><a href="#cb2-25"></a>     </span>
-<span id="cb2-26"><a href="#cb2-26"></a>    A <span class="op">=</span> np.array([p1 <span class="op">-</span> p0, p2 <span class="op">-</span> p0])</span>
-<span id="cb2-27"><a href="#cb2-27"></a>    Drho.append(np.linalg.inv(A) <span class="op">@</span> np.array([r1 <span class="op">-</span> r0, r2 <span class="op">-</span> r0]))</span>
-<span id="cb2-28"><a href="#cb2-28"></a>    Dv.append(np.linalg.inv(A) <span class="op">@</span> np.array([v1 <span class="op">-</span> v0, v2 <span class="op">-</span> v0]))</span></code></pre></div>
+<span id="cb2-20"><a href="#cb2-20"></a><span class="cf">for</span> sim <span class="kw">in</span> sims:</span>
+<span id="cb2-21"><a href="#cb2-21"></a>    [p0, p1, p2] <span class="op">=</span> points[sim] </span>
+<span id="cb2-22"><a href="#cb2-22"></a>    [r0, r1, r2] <span class="op">=</span> rho[sim]</span>
+<span id="cb2-23"><a href="#cb2-23"></a>    [v0, v1, v2] <span class="op">=</span> velocities[sim]</span>
+<span id="cb2-24"><a href="#cb2-24"></a>     </span>
+<span id="cb2-25"><a href="#cb2-25"></a>    A <span class="op">=</span> np.array([p1 <span class="op">-</span> p0, p2 <span class="op">-</span> p0])</span>
+<span id="cb2-26"><a href="#cb2-26"></a>    Drho.append(np.linalg.inv(A) <span class="op">@</span> np.array([r1 <span class="op">-</span> r0, r2 <span class="op">-</span> r0]))</span>
+<span id="cb2-27"><a href="#cb2-27"></a>    Dv.append(np.linalg.inv(A) <span class="op">@</span> np.array([v1 <span class="op">-</span> v0, v2 <span class="op">-</span> v0]))</span></code></pre></div>
 <ol start="3" type="1">
 <li>For a point <span class="math inline">\(\boldsymbol{x} \in \mathbb{R}^d\)</span>, find the simplex which it contains and evaluate the linear interpolation for the density and the velocity field:</li>
 </ol>
 <div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python numberLines"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">def</span> dens(x, rho, Drho, delaunay):</span>
 <span id="cb3-2"><a href="#cb3-2"></a>  simplexIndex <span class="op">=</span> delaunay.find_simplex(x)</span>
 <span id="cb3-3"><a href="#cb3-3"></a>  pointIndex  <span class="op">=</span> delaunay.simplices[simplexIndex][<span class="dv">0</span>]</span>
-<span id="cb3-4"><a href="#cb3-4"></a></span>
-<span id="cb3-5"><a href="#cb3-5"></a>  <span class="cf">return</span> rho[pointIndex] <span class="op">+</span> Drho[simplexIndex] <span class="op">@</span> (x <span class="op">-</span> delaunay.points[pointIndex])</span>
-<span id="cb3-6"><a href="#cb3-6"></a></span>
-<span id="cb3-7"><a href="#cb3-7"></a><span class="kw">def</span> v(x, velocities, Dv, delaunay):</span>
-<span id="cb3-8"><a href="#cb3-8"></a>  simplexIndex <span class="op">=</span> delaunay.find_simplex(x)</span>
-<span id="cb3-9"><a href="#cb3-9"></a>  pointIndex  <span class="op">=</span> delaunay.simplices[simplexIndex][<span class="dv">0</span>]</span>
-<span id="cb3-10"><a href="#cb3-10"></a>   </span>
-<span id="cb3-11"><a href="#cb3-11"></a>  <span class="cf">return</span> velocities[pointIndex] <span class="op">+</span> Dv[simplexIndex] <span class="op">@</span> (x <span class="op">-</span> delaunay.points[pointIndex])</span></code></pre></div>
-<p>The velocity deformation modes follow similarly</p>
+<span id="cb3-4"><a href="#cb3-4"></a>  <span class="cf">return</span> rho[pointIndex] <span class="op">+</span> Drho[simplexIndex] <span class="op">@</span> (x <span class="op">-</span> delaunay.points[pointIndex])</span>
+<span id="cb3-5"><a href="#cb3-5"></a></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="kw">def</span> v(x, velocities, Dv, delaunay):</span>
+<span id="cb3-7"><a href="#cb3-7"></a>  simplexIndex <span class="op">=</span> delaunay.find_simplex(x)</span>
+<span id="cb3-8"><a href="#cb3-8"></a>  pointIndex  <span class="op">=</span> delaunay.simplices[simplexIndex][<span class="dv">0</span>]</span>
+<span id="cb3-9"><a href="#cb3-9"></a>  <span class="cf">return</span> velocities[pointIndex] <span class="op">+</span> Dv[simplexIndex] <span class="op">@</span> (x <span class="op">-</span> delaunay.points[pointIndex])</span></code></pre></div>
+<p>The velocity deformation modes follow similarly:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python numberLines"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">def</span> theta(x, velocities, Dv, delaunay):</span>
 <span id="cb4-2"><a href="#cb4-2"></a>  simplexIndex <span class="op">=</span> delaunay.find_simplex(x)</span>
 <span id="cb4-3"><a href="#cb4-3"></a>  pointIndex  <span class="op">=</span> delaunay.simplices[simplexIndex][<span class="dv">0</span>]</span>
-<span id="cb4-4"><a href="#cb4-4"></a>   </span>
-<span id="cb4-5"><a href="#cb4-5"></a>  <span class="cf">return</span> np.trace(Dv[simplexIndex])</span>
-<span id="cb4-6"><a href="#cb4-6"></a></span>
-<span id="cb4-7"><a href="#cb4-7"></a><span class="kw">def</span> omega(x, velocities, Dv, delaunay):</span>
-<span id="cb4-8"><a href="#cb4-8"></a>  simplexIndex <span class="op">=</span> delaunay.find_simplex(x)</span>
-<span id="cb4-9"><a href="#cb4-9"></a>  pointIndex  <span class="op">=</span> delaunay.simplices[simplexIndex][<span class="dv">0</span>]</span>
-<span id="cb4-10"><a href="#cb4-10"></a>   </span>
-<span id="cb4-11"><a href="#cb4-11"></a>  <span class="cf">return</span> Dv[simplexIndex][<span class="dv">1</span>,<span class="dv">0</span>] <span class="op">-</span> Dv[simplexIndex][<span class="dv">0</span>,<span class="dv">1</span>]</span></code></pre></div>
+<span id="cb4-4"><a href="#cb4-4"></a>  <span class="cf">return</span> np.trace(Dv[simplexIndex])</span>
+<span id="cb4-5"><a href="#cb4-5"></a></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="kw">def</span> omega(x, velocities, Dv, delaunay):</span>
+<span id="cb4-7"><a href="#cb4-7"></a>  simplexIndex <span class="op">=</span> delaunay.find_simplex(x)</span>
+<span id="cb4-8"><a href="#cb4-8"></a>  pointIndex  <span class="op">=</span> delaunay.simplices[simplexIndex][<span class="dv">0</span>]</span>
+<span id="cb4-9"><a href="#cb4-9"></a>  <span class="cf">return</span> Dv[simplexIndex][<span class="dv">1</span>,<span class="dv">0</span>] <span class="op">-</span> Dv[simplexIndex][<span class="dv">0</span>,<span class="dv">1</span>]</span></code></pre></div>
 <h2 id="example">Example</h2>
 </body>
 </html>
