@@ -145,7 +145,7 @@ V(D) = \frac{1}{d!}
 Fig. 2 - The star of a vertex in a Delaunay tessellation
 </figcaption>
 </figure>
-<p>Using this observation, we reorder the double sum, by collecting the terms involving <span class="math inline">\(\rho_i\)</span> leading to the terms <span class="math inline">\(\rho_i(V(D_{l_0}) + \dots + V(D_{l_n}) = \rho_i V(W_i)\)</span>, with the <span class="math inline">\(D_{l_i}\)</span>’s forming the star of <span class="math inline">\(\boldsymbol{p}_i\)</span>. The integral over the density is now a single sum over the points in <span class="math inline">\(\mathcal{P}\)</span>, <em>i.e.,</em></p>
+<p>Using this observation, we reorder the double sum, by collecting the terms involving <span class="math inline">\(\rho_i\)</span> leading to the terms <span class="math inline">\(\rho_i(V(D_{l_0}) + \dots + V(D_{l_n})) = \rho_i V(W_i)\)</span>, with the <span class="math inline">\(D_{l_i}\)</span>’s forming the star of <span class="math inline">\(\boldsymbol{p}_i\)</span>. The integral over the density is now a single sum over the points in <span class="math inline">\(\mathcal{P}\)</span>, <em>i.e.,</em></p>
 <p><span class="math display">\[
 \int \rho(\boldsymbol{x}) \mathrm{d}\boldsymbol{x} =\frac{1}{d+1} \sum_{i=1}^N \rho_i V(W_i).
 \]</span></p>
@@ -249,13 +249,11 @@ Fig. 2 - The star of a vertex in a Delaunay tessellation
 <p>The velocity deformation modes follow similarly:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python numberLines"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">def</span> theta(x, y, velocities, Dv, delaunay):</span>
 <span id="cb4-2"><a href="#cb4-2"></a>    simplexIndex <span class="op">=</span> delaunay.find_simplex([x, y])</span>
-<span id="cb4-3"><a href="#cb4-3"></a>    pointIndex   <span class="op">=</span> delaunay.simplices[simplexIndex][<span class="dv">0</span>]</span>
-<span id="cb4-4"><a href="#cb4-4"></a>    <span class="cf">return</span>  Dv[simplexIndex][<span class="dv">0</span>,<span class="dv">0</span>] <span class="op">+</span> Dv[simplexIndex][<span class="dv">1</span>,<span class="dv">1</span>]</span>
-<span id="cb4-5"><a href="#cb4-5"></a></span>
-<span id="cb4-6"><a href="#cb4-6"></a><span class="kw">def</span> omega(x, y, velocities, Dv, delaunay):</span>
-<span id="cb4-7"><a href="#cb4-7"></a>    simplexIndex <span class="op">=</span> delaunay.find_simplex([x, y])</span>
-<span id="cb4-8"><a href="#cb4-8"></a>    pointIndex   <span class="op">=</span> delaunay.simplices[simplexIndex][<span class="dv">0</span>]</span>
-<span id="cb4-9"><a href="#cb4-9"></a>    <span class="cf">return</span> Dv[simplexIndex][<span class="dv">1</span>,<span class="dv">0</span>] <span class="op">-</span> Dv[simplexIndex][<span class="dv">0</span>,<span class="dv">1</span>]</span></code></pre></div>
+<span id="cb4-3"><a href="#cb4-3"></a>    <span class="cf">return</span>  Dv[simplexIndex][<span class="dv">0</span>,<span class="dv">0</span>] <span class="op">+</span> Dv[simplexIndex][<span class="dv">1</span>,<span class="dv">1</span>]</span>
+<span id="cb4-4"><a href="#cb4-4"></a></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="kw">def</span> omega(x, y, velocities, Dv, delaunay):</span>
+<span id="cb4-6"><a href="#cb4-6"></a>    simplexIndex <span class="op">=</span> delaunay.find_simplex([x, y])</span>
+<span id="cb4-7"><a href="#cb4-7"></a>    <span class="cf">return</span> Dv[simplexIndex][<span class="dv">1</span>,<span class="dv">0</span>] <span class="op">-</span> Dv[simplexIndex][<span class="dv">0</span>,<span class="dv">1</span>]</span></code></pre></div>
 <h2 id="example">Example</h2>
 <p>To illustrate the method, we apply DTFE to a two-dimensional point set consisting of <span class="math inline">\(256^2\)</span> particles and their velocities (see <a href="https://github.com/jfeldbrugge/DTFE/blob/master/DTFE%202D.ipynb">code</a>). Consider the dataset</p>
 <figure>
