@@ -5,3 +5,5 @@ makefile
 Literature
 *.svg
 .ipynb_checkpoints
+.entangled
+
