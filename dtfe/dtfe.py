@@ -6,67 +6,11 @@ from __future__ import annotations
 import numpy as np
 from scipy.spatial import Delaunay
 import numba
-from numba import float32, float64, int64
 from typing import Union
 
-# ~\~ begin <<lit/implementation.md|triangle-area>>[0]
-@numba.jit(nopython=True, nogil=True)
-def triangle_area(sim: int64[:], points: float64[:,:]):
-    return abs(np.linalg.det(np.stack((points[sim[1]] - points[sim[0]], 
-                                       points[sim[2]] - points[sim[0]])))) / 2
-# ~\~ end
-# ~\~ begin <<lit/implementation.md|compute-densities>>[0]
-@numba.jit(nopython=True, nogil=True)
-def compute_densities(pts: float64[:,:], cells: float64[:,:],
-                      m: Union[float64, float64[:]]) -> np.ndarray:
-    M = len(pts)
-    area = np.zeros(M, dtype='float64')
-    for cell in cells:
-        area[cell] += triangle_area(cell, pts)
-    return 3 * m / area
-# ~\~ end
-# ~\~ begin <<lit/implementation.md|compute-gradient-scalar>>[0]
-@numba.jit(nopython=True, nogil=True)
-def compute_gradient_scalar(
-        pts: float64[:,:], simps: int64[:,:], rho: float64[:]
-        ) -> float64[:,:]:
-    N = len(simps)
-    result = np.zeros((N, 2), dtype='float64')
+from . import impl2d
+from . import impl3d
 
-    for i, s in enumerate(simps):
-        [p0, p1, p2] = pts[s]
-        [r0, r1, r2] = rho[s]
-        # ~\~ begin <<lit/implementation.md|invert-2x2-matrix>>[0]
-        A: float64[:,:] = np.stack((p1 - p0, p2 - p0))
-        det = A[0,0] * A[1,1] - A[1,0] * A[0,1]
-        Ainv = np.array([[A[1,1] / det, -A[0,1] / det],
-                         [-A[1,0] / det, A[0,0] / det]])
-        # ~\~ end
-        result[i] = Ainv @ np.array([r1 - r0, r2 - r0])
-
-    return result
-# ~\~ end
-# ~\~ begin <<lit/implementation.md|compute-gradient-vector>>[0]
-@numba.jit(nopython=True, nogil=True)
-def compute_gradient_vector(
-        pts: float64[:,:], simps: float64[:,:], v: float64[:,:]
-        ) -> float64[:,:,:]:
-    N = len(simps)
-    result = np.zeros((N, 2, 2), dtype='float64')
-
-    for i, s in enumerate(simps):
-        [p0, p1, p2] = pts[s]
-        [v0, v1, v2] = v[s]
-        # ~\~ begin <<lit/implementation.md|invert-2x2-matrix>>[0]
-        A: float64[:,:] = np.stack((p1 - p0, p2 - p0))
-        det = A[0,0] * A[1,1] - A[1,0] * A[0,1]
-        Ainv = np.array([[A[1,1] / det, -A[0,1] / det],
-                         [-A[1,0] / det, A[0,0] / det]])
-        # ~\~ end
-        result[i] = Ainv @ np.stack((v1 - v0, v2 - v0))
-
-    return result
-# ~\~ end
 # ~\~ begin <<lit/implementation.md|map-affine>>[0]
 @numba.jit(nopython=True, nogil=True)
 def map_affine(a, b, c):
@@ -78,8 +22,21 @@ def map_affine(a, b, c):
 # ~\~ end
 
 class Triangulation(Delaunay):
+    @property
+    def _ndim(self):
+        return self.points.shape[-1]
+
+    @property
+    def _impl(self):
+        if self._ndim == 2:
+            return impl2d
+        elif self._ndim == 3:
+            return impl3d
+        else:
+            raise("Only implemented in 2d and 3d.")
+
     def density(self, bias=1.0):
-        return compute_densities(self.points, self.simplices, bias)
+        return self._impl.compute_densities(self.points, self.simplices, bias)
 
     def dtfe(self, bias: Union[float, np.ndarray] = 1.0) -> Interpolation:
         return self.interpolate(self.density(bias))
@@ -95,19 +52,21 @@ class Interpolation:
         self.triangulation = t
         self.field = f
         if f.ndim == 1:
-            self.gradient = compute_gradient_scalar(t.points, t.simplices, f)
+            self.gradient = self.triangulation._impl.compute_gradient_scalar(
+                t.points, t.simplices, f)
         elif f.ndim == 2:
-            self.gradient = compute_gradient_vector(t.points, t.simplices, f)
+            self.gradient = self.triangulation._impl.compute_gradient_vector(
+                t.points, t.simplices, f)
         else:
             raise ValueError("Interpolation only supported for scalar and vector values.")
 
-    def __call__(self, x: np.ndarray, y: np.ndarray):
-        pts = np.c_[x.flat, y.flat]
+    def __call__(self, *mesh):
+        pts = np.stack([axis.flat for axis in mesh], axis=1)
         simplexIndex = self.triangulation.find_simplex(pts)
         pointIndex = self.triangulation.simplices[simplexIndex][...,0]
         f = map_affine(self.field[pointIndex], self.gradient[simplexIndex],
                        pts - self.triangulation.points[pointIndex])
-        return f.reshape(x.shape + (-1,))
+        return f.reshape(mesh[0].shape + (-1,))
 
     # def theta(self, x, y):
     #     simplexIndex = self.delaunay.find_simplex(np.c_[x, y])
