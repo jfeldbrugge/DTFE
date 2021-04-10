@@ -128,7 +128,6 @@ def compute_gradient_scalar(
     for i, s in enumerate(simps):
         [p0, p1, p2, p3] = pts[s]
         [r0, r1, r2, r3] = rho[s]
-        [v0, v1, v2, v3] = v[s]
 
         A = np.stack((p1 - p0, p2 - p0, p3 - p0))
         gradient[i] = np.linalg.solve(A, np.array([r1 - r0, r2 - r0, r3 - r0]))
@@ -143,7 +142,6 @@ def compute_gradient_vector(
 
     for i, s in enumerate(simps):
         [p0, p1, p2, p3] = pts[s]
-        [r0, r1, r2, r3] = rho[s]
         [v0, v1, v2, v3] = v[s]
 
         A = np.stack((p1 - p0, p2 - p0, p3 - p0))
