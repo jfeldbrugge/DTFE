@@ -64,7 +64,7 @@ def compute_gradient_scalar(
     return result
 ```
 
-``` {.python #compute-gradient}
+``` {.python #compute-gradient-vector}
 @numba.jit(nopython=True, nogil=True)
 def compute_gradient_vector(
         pts: float64[:,:], simps: float64[:,:], v: float64[:,:]
@@ -91,7 +91,8 @@ from typing import Union
 
 <<triangle-area>>
 <<compute-densities>>
-<<compute-gradient>>
+<<compute-gradient-scalar>>
+<<compute-gradient-vector>>
 <<map-affine>>
 
 class Triangulation(Delaunay):
