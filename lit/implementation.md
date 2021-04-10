@@ -34,7 +34,7 @@ def compute_densities(pts: float64[:,:], cells: float64[:,:],
     M = len(pts)
     area = np.zeros(M, dtype='float64')
     for cell in cells:
-        area[cell] += triangle_area(sim, pts)
+        area[cell] += triangle_area(cell, pts)
     return 3 * m / area
 ```
 
@@ -83,6 +83,8 @@ def compute_gradient_vector(
 
 ``` {.python file=dtfe/dtfe.py}
 #Load the numpy and scipy libraries
+from __future__ import annotations
+
 import numpy as np
 from scipy.spatial import Delaunay
 import numba
@@ -112,19 +114,19 @@ class Interpolation:
     def __init__(self, t: Triangulation, f: np.ndarray):
         self.triangulation = t
         self.field = f
-        if f.ndim == 2:
+        if f.ndim == 1:
             self.gradient = compute_gradient_scalar(t.points, t.simplices, f)
-        elif f.ndim == 3:
+        elif f.ndim == 2:
             self.gradient = compute_gradient_vector(t.points, t.simplices, f)
         else:
             raise ValueError("Interpolation only supported for scalar and vector values.")
 
-    def __call__(x: np.ndarray, y: np.ndarray):
+    def __call__(self, x: np.ndarray, y: np.ndarray):
         pts = np.c_[x.flat, y.flat]
         simplexIndex = self.triangulation.find_simplex(pts)
-        pointIndex = self.triangualtion.simplices[simplexIndex][...,0]
+        pointIndex = self.triangulation.simplices[simplexIndex][...,0]
         f = map_affine(self.field[pointIndex], self.gradient[simplexIndex],
-                       pts - self.delaunay.points[pointIndex])
+                       pts - self.triangulation.points[pointIndex])
         return f.reshape(x.shape + (-1,))
 
     # def theta(self, x, y):
