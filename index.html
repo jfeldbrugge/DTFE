@@ -99,7 +99,7 @@
 <h3 id="density-reconstruction">Density reconstruction</h3>
 <p>Given the pointset <span class="math inline">\(\mathcal{P}\)</span>, consider the Delaunay tesselation <span class="math inline">\(\mathcal{D}\)</span> consisting of <span class="math inline">\(N_T\)</span> labelled simplices <span class="math inline">\(D_i\)</span>, with <span class="math inline">\(i=1,\dots, N_T\)</span>. In two dimensions, a simplex is a triangle spanning three points in <span class="math inline">\(\mathcal{P}\)</span>. In three dimensions, a simplex is a tetrahedron spanning four points in <span class="math inline">\(\mathcal{P}\)</span>.</p>
 <figure>
-<img src='figures/Delaunay.png' width=50% />
+<a href='figures/Delaunay.png'><img src='figures/Delaunay.png' width=50% /></a>
 <figcaption>
 Fig. 1 - A two-dimensional Delaunay tessellation with the circumscribed circles. The Delaunay tesselation has the property that no vertex is in the circumcribed circle of a triangle.
 </figcaption>
@@ -141,7 +141,7 @@ V(D) = \frac{1}{d!}
 \]</span></p>
 <p>where the first sum runs over the simplices of the tessellation and the second sum runs over the vertices of a given simplex. Note that <span class="math inline">\(\rho_i\)</span> enters the sum for each simplex for which it is a vertex. These simplices form the star <span class="math inline">\(W_i\)</span> of the point <span class="math inline">\(\boldsymbol{p}_i\)</span></p>
 <figure>
-<img src='figures/Star.png' width=90% />
+<a href='figures/Star.png'><img src='figures/Star.png' width=90% /></a>
 <figcaption>
 Fig. 2 - The star of a vertex in a Delaunay tessellation
 </figcaption>
@@ -258,21 +258,21 @@ Fig. 2 - The star of a vertex in a Delaunay tessellation
 <h2 id="example">Example</h2>
 <p>To illustrate the method, we apply DTFE to a two-dimensional point set consisting of <span class="math inline">\(256^2\)</span> particles and their velocities (see <a href="https://github.com/jfeldbrugge/DTFE/blob/master/DTFE%202D.ipynb">code</a>). Consider the dataset</p>
 <figure>
-<img src='figures/examplePoints.png' width=75% />
+<a href='figures/examplePoints.png'><img src='figures/examplePoints.png' width=75% /></a>
 <figcaption>
 Fig. 3 - A point set from a two-dimensional N-body simulation
 </figcaption>
 </figure>
 <p>leading to the Delaunay tesselation</p>
 <figure>
-<img src='figures/exampleDelaunay.png' width=75% />
+<a href='figures/exampleDelaunay.png'><img src='figures/exampleDelaunay.png' width=75% /></a>
 <figcaption>
 Fig. 4 - The Delaunay tessellation of the point set plotted in figure 3
 </figcaption>
 </figure>
 <p>Using the DTFE method, we reconstruct the density field</p>
 <figure>
-<img src='figures/exampleDensity.png' width=75% />
+<a href='figures/exampleDensity.png'><img src='figures/exampleDensity.png' width=75% /></a>
 <figcaption>
 Fig. 5 - The reconstruction of the density of the point set plotted in figure 3
 </figcaption>
